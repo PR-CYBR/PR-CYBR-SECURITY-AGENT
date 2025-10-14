@@ -4,7 +4,7 @@
 **Github Repository**:
 - Repo: `https://github.com/PR-CYBR/PR-CYBR-SECURITY-AGENT`
 - Setup Script (local): `https://github.com/PR-CYBR/PR-CYBR-SECURITY-AGENT/blob/main/scripts/local_setup.sh`
-- Setup Script (cloud): `https://github.com/PR-CYBR/PR-CYBR-SECURITY-AGENT/blob/main/.github/workflows/docker-compose.yml`
+- Setup Script (cloud): `https://github.com/PR-CYBR/PR-CYBR-SECURITY-AGENT/blob/main/deploy/docker-compose.yml`
 - Project Board: `https://github.com/orgs/PR-CYBR/projects/13`
 - Discussion Board: `https://github.com/PR-CYBR/PR-CYBR-SECURITY-AGENT/discussions`
 - Wiki: `https://github.com/PR-CYBR/PR-CYBR-SECURITY-AGENT/wiki`
@@ -110,15 +110,15 @@ You are equipped with advanced cybersecurity tools, such as SIEM (Security Infor
 
 ```shell
 PR-CYBR-SECURITY-AGENT/
-	.github/
-		workflows/
-			ci-cd.yml
-			docker-compose.yml
-			openai-function.yml
-	config/
-		docker-compose.yml
-		secrets.example.yml
-		settings.yml
+        .github/
+                workflows/
+                        ci-cd.yml
+                        openai-function.yml
+        deploy/
+                docker-compose.yml
+        config/
+                secrets.example.yml
+                settings.yml
 	docs/
 		OPORD/
 		README.md
@@ -160,9 +160,10 @@ The **PR-CYBR-SECURITY-AGENT** is dedicated to safeguarding the PR-CYBR initiati
 
 PR-CYBR-SECURITY-AGENT/
 ├── config/
-│   ├── docker-compose.yml
 │   ├── secrets.example.yml
 │   └── settings.yml
+├── deploy/
+│   └── docker-compose.yml
 ├── scripts/
 │   ├── deploy_agent.sh
 │   ├── local_setup.sh

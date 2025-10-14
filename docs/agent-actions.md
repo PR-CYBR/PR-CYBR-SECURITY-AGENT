@@ -19,8 +19,8 @@ Key Objectives for this Document:
 - Explanation of workflow file structure (e.g., `.yml` format).
 - Common workflow files used in PR-CYBR Agents:
   - `ci-cd.yml`
-  - `docker-compose.yml`
   - `openai-function.yml`
+  - `deploy/docker-compose.yml` (Docker Compose specification referenced by deployment tooling)
 
 ### Environment Variables
 - Overview of `.env` file usage to securely manage sensitive variables.
