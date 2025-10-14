@@ -103,7 +103,7 @@
 # PR-CYBR-SECURITY-AGENT
 # - GitHub: https://github.com/PR-CYBR/PR-CYBR-SECURITY-AGENT
 # - Local Setup Script: https://github.com/PR-CYBR/PR-CYBR-SECURITY-AGENT/blob/main/scripts/local_setup.sh
-# - Cloud Setup Script: https://github.com/PR-CYBR/PR-CYBR-SECURITY-AGENT/blob/main/.github/workflows/docker-compose.yml
+# - Cloud Setup Script: https://github.com/PR-CYBR/PR-CYBR-SECURITY-AGENT/blob/main/deploy/docker-compose.yml
 
 # PR-CYBR-TESTING-AGENT
 # - GitHub: https://github.com/PR-CYBR/PR-CYBR-TESTING-AGENT
@@ -430,7 +430,7 @@ log_message "Executing setup scripts for each agent repository..."
 for REPO_PATH in "$CLONE_DIR"/*; do
     REPO_NAME=$(basename "$REPO_PATH")
     LOCAL_SETUP_SCRIPT="$REPO_PATH/setup.py"
-    CLOUD_SETUP_SCRIPT="$REPO_PATH/docker-compose.yml"
+    CLOUD_SETUP_SCRIPT="$REPO_PATH/deploy/docker-compose.yml"
 
     if [ -f "$LOCAL_SETUP_SCRIPT" ]; then
         log_message "Running local setup script for '$REPO_NAME'..."
