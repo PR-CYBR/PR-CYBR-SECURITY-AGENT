@@ -1,0 +1,21 @@
+agent:
+  name: PR-CYBR-SECURITY-AGENT
+  description: Performs static analysis and dependency scanning to identify vulnerabilities.
+  triggers:
+    - type: manual
+      event: "/scan"
+    - type: scheduled
+      cron: "0 3 * * *"  # daily 3 AM UTC
+  tasks:
+    - id: static_analysis
+      tool: bandit
+      command: "bandit -r src -f json -o reports/bandit.json"
+      output: "issue:create"
+    - id: dependency_scan
+      tool: safety
+      command: "safety check --full-report > reports/dependency_scan.txt"
+      output: "issue:create"
+  codex_integration:
+    enabled: true
+    fallback: "local_linter"
+    on_fail: "log_warning"
