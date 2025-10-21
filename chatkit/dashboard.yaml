@@ -1,0 +1,14 @@
+dashboard:
+  name: PR-CYBR-SECURITY-DASH
+  widgets:
+    - id: build_status
+      type: build_status
+      source: ci_pipeline
+    - id: vulnerability_alerts
+      type: vulnerability_alerts
+      source: reports/bandit.json
+    - id: human_loop
+      type: human_loop
+      actions:
+        - manual_task_submit
+        - approve_action
