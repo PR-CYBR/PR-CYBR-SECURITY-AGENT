@@ -53,31 +53,28 @@ _This script configures the agent with default settings for local development._
 
 ### Cloud Deployment
 
-To deploy the agent to a cloud environment:
+This repository now uses the Terraform Cloud–GitHub workflow bridge so that all sensitive infrastructure values stay in Terraform Cloud. GitHub Actions only uploads configuration and triggers Terraform Cloud runs.
 
-1. **Configure Repository Secrets**
+1. **Configure Terraform Cloud**
 
-- Navigate to `Settings` > `Secrets and variables` > `Actions` in your GitHub repository.
-- Add the required secrets:
-   - `CLOUD_API_KEY`
-   - `DOCKERHUB_USERNAME`
-   - `DOCKERHUB_PASSWORD`
-   - Any other cloud-specific credentials.
+   - Create or reuse the Terraform Cloud workspace that manages this agent.
+   - Store provider credentials, environment settings, and other secrets as Terraform Cloud workspace variables.
+   - Generate a Terraform Cloud user or team API token and save it as the `TFC_TOKEN` GitHub Actions secret.
 
-2. **Deploy Using GitHub Actions**
+2. **Provide Repository Metadata**
 
-- The deployment workflow is defined in `.github/workflows/docker-compose.yml`.
-- Push changes to the `main` branch to trigger the deployment workflow automatically.
+   - In GitHub, navigate to `Settings` → `Secrets and variables` → `Actions` → `Variables`.
+   - Define the following repository variables so the workflows can target the correct workspace:
+     - `TF_CLOUD_ORGANIZATION`
+     - `TF_WORKSPACE`
+     - `TF_CONFIG_DIRECTORY` (optional, defaults to the repository root when unset)
 
-3. **Manual Deployment**
+3. **Terraform Cloud Workflows**
 
-- Use the deployment script for manual deployment:
+   - `.github/workflows/terraform-cloud-speculative.yml` uploads configuration and starts speculative runs for pull requests targeting `main` and for pushes to the automation branches (`codex`, `agents`).
+   - `.github/workflows/terraform-cloud-apply.yml` uploads configuration and requests an apply run when changes land on `main`.
 
-```bash
-./scripts/deploy_agent.sh
-```
-
-- Ensure you have Docker and cloud CLI tools installed and configured on your machine.
+With this bridge in place, Terraform Cloud remains the system of record for secrets while GitHub Actions orchestrates run creation.
 
 ## Integration
 
