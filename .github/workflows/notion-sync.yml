@@ -1,0 +1,63 @@
+name: notion-sync
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+  issues:
+    types: [opened, edited, closed]
+  pull_request:
+    types: [opened, synchronize, closed]
+  discussions:
+    types: [created, answered]
+  project_card:
+    types: [created, moved, updated]
+  workflow_run:
+    workflows:
+      - dev
+      - stage
+      - prod
+    types:
+      - completed
+
+permissions:
+  actions: read
+  contents: read
+  discussions: read
+  issues: read
+  projects: read
+  pull-requests: read
+
+jobs:
+  sync:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+          pip install notion-client
+
+      - name: Run Notion synchronization
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_TASK_DB: ${{ secrets.NOTION_TASK_DB }}
+          NOTION_PR_DB: ${{ secrets.NOTION_PR_DB }}
+          NOTION_PROJECT_DB: ${{ secrets.NOTION_PROJECT_DB }}
+          NOTION_DISCUSSION_DB: ${{ secrets.NOTION_DISCUSSION_DB }}
+        run: |
+          python scripts/notion_sync.py --event-path "$GITHUB_EVENT_PATH"
