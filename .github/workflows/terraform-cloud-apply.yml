@@ -1,0 +1,88 @@
+name: terraform-cloud-apply
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**/*.tf'
+      - '**/*.tfvars'
+      - '.terraform.lock.hcl'
+
+permissions:
+  contents: read
+
+env:
+  TF_CLOUD_ORGANIZATION: ${{ vars.TF_CLOUD_ORGANIZATION }}
+  TF_WORKSPACE: ${{ vars.TF_WORKSPACE }}
+  RAW_CONFIG_DIRECTORY: ${{ vars.TF_CONFIG_DIRECTORY }}
+  TF_API_TOKEN: ${{ secrets.TFC_TOKEN }}
+
+jobs:
+  apply-run:
+    name: Trigger apply run in Terraform Cloud
+    runs-on: ubuntu-latest
+    if: ${{ env.TF_CLOUD_ORGANIZATION != '' && env.TF_WORKSPACE != '' && env.TF_API_TOKEN != '' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Resolve Terraform configuration directory
+        run: |
+          if [ -z "${RAW_CONFIG_DIRECTORY:-}" ]; then
+            echo "CONFIG_DIRECTORY=." >> "$GITHUB_ENV"
+          else
+            echo "CONFIG_DIRECTORY=${RAW_CONFIG_DIRECTORY}" >> "$GITHUB_ENV"
+          fi
+
+      - name: Upload configuration to Terraform Cloud
+        id: upload
+        uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.3.2
+        with:
+          workspace: ${{ env.TF_WORKSPACE }}
+          directory: ${{ env.CONFIG_DIRECTORY }}
+
+      - name: Create run in Terraform Cloud
+        id: run
+        uses: hashicorp/tfc-workflows-github/actions/create-run@v1.3.2
+        continue-on-error: true
+        with:
+          workspace: ${{ env.TF_WORKSPACE }}
+          configuration_version: ${{ steps.upload.outputs.configuration_version_id }}
+          message: "Apply run from GitHub Actions for ${{ github.sha }}"
+
+      - name: Check for run creation errors
+        if: ${{ steps.run.outcome == 'failure' }}
+        run: |
+          echo "Terraform Cloud run could not be created."
+          exit 1
+
+      - name: Auto-apply run when confirmation required
+        id: apply
+        if: ${{ steps.run.outcome == 'success' && fromJSON(steps.run.outputs.payload).data.attributes.actions.IsConfirmable }}
+        uses: hashicorp/tfc-workflows-github/actions/apply-run@v1.3.2
+        with:
+          run: ${{ steps.run.outputs.run_id }}
+          comment: "Apply run approved by GitHub Actions for ${{ github.sha }}"
+
+      - name: Refresh run status
+        if: ${{ steps.run.outcome == 'success' }}
+        id: run_status
+        uses: hashicorp/tfc-workflows-github/actions/show-run@v1.3.2
+        with:
+          run: ${{ steps.run.outputs.run_id }}
+
+      - name: Fail workflow if run not applied
+        if: ${{ steps.run.outcome == 'success' && !contains(['applied','planned_and_finished'], steps.run_status.outputs.run_status) }}
+        run: |
+          echo "Terraform Cloud run requires attention"
+          echo "Status: ${{ steps.run_status.outputs.run_status }}"
+          echo "Link: ${{ steps.run_status.outputs.run_link }}"
+          exit 1
+
+      - name: Ensure configuration upload succeeded
+        if: ${{ steps.upload.outputs.status != 'Success' }}
+        run: |
+          echo "Terraform Cloud configuration upload failed"
+          exit 1
