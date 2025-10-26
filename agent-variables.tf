@@ -78,3 +78,69 @@ variable "AGENT_COLLAB" {
   sensitive   = true
   description = "Token for governance, discussions, issues, project boards"
 }
+
+# --- Notion Workspace ---
+variable "NOTION_DISCUSSIONS_ARC_DB_ID" {
+  type        = string
+  description = "Database ID for discussions archive tracking"
+}
+
+variable "NOTION_ISSUES_BACKLOG_DB_ID" {
+  type        = string
+  description = "Database ID for backlog of issues"
+}
+
+variable "NOTION_KNOWLEDGE_FILE_DB_ID" {
+  type        = string
+  description = "Database ID for knowledge file repository"
+}
+
+variable "NOTION_PAGE_ID" {
+  type        = string
+  description = "Root Notion page for the agent"
+}
+
+variable "NOTION_PR_BACKLOG_DB_ID" {
+  type        = string
+  description = "Database ID for pull request backlog management"
+}
+
+variable "NOTION_PROJECT_BOARD_BACKLOG_DB_ID" {
+  type        = string
+  description = "Database ID for project board backlog"
+}
+
+variable "NOTION_TASK_BACKLOG_DB_ID" {
+  type        = string
+  description = "Database ID for task backlog tracking"
+}
+
+variable "NOTION_TOKEN" {
+  type        = string
+  sensitive   = true
+  description = "Integration token for Notion API access"
+}
+
+# --- Automation Secrets ---
+variable "PR_CYBR_DOCKER_PASS" {
+  type        = string
+  sensitive   = true
+  description = "Docker Hub password used for publishing images"
+}
+
+variable "PR_CYBR_DOCKER_USER" {
+  type        = string
+  description = "Docker Hub username used for publishing images"
+}
+
+variable "TFC_TOKEN" {
+  type        = string
+  sensitive   = true
+  description = "Terraform Cloud user token for API and CLI auth"
+}
+
+variable "GITHUB_TOKEN" {
+  type        = string
+  sensitive   = true
+  description = "GitHub token leveraged by automation workflows"
+}
