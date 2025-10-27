@@ -25,6 +25,9 @@ var/
 *.log
 *.tmp
 
+# Terraform local state artifacts
+.terraform/
+
 # VSCode settings
 .vscode/
 
