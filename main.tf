@@ -4,15 +4,6 @@
 terraform {
   required_version = ">= 1.0"
   
-  # Terraform Cloud backend configuration (values managed in TFC)
-  cloud {
-    organization = "pr-cybr"
-    
-    workspaces {
-      name = "pr-cybr-security-agent"
-    }
-  }
-  
   required_providers {
     null = {
       source  = "hashicorp/null"
